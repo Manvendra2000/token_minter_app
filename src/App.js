@@ -8,7 +8,7 @@ function App() {
   const [contract, setContract] = useState(null);
   const [balance, setBalance] = useState(null);
   const [mintAmount, setMintAmount] = useState('');
-
+  const [burnAmount, setBurnAmount] = useState('');
 
   const connectWallet = async () => {
     if (window.ethereum) {
@@ -59,15 +59,43 @@ const handleMint = async () => {
     try {
       const amountInWei = ethers.parseEther(mintAmount);
       const tx = await contract.mint(amountInWei);
-      await tx.wait();
+      await tx.wait(); // wait for confirmation
       alert("Mint Successful!");
-      getBalance();
+      getBalance(); // refresh balance
     } catch(error) {
       console.error("Error minting tokens:", error);
       alert("Mint Failed!");
     }
   }
 };
+
+// const handleBurn = async () => {
+//   if (contract && burnAmount) {
+//     try {
+//       const amountInWei = ethers.parseEther(burnAmount);
+//       const tx = await contract.burn(amountInWei);
+//       await tx.wait();
+//       alert("Burn Successful!");
+//       getBalance();
+//     } catch (error) {
+//       console.error("Error burning tokens:", error);
+//       alert("Burn Failed!");
+//     }
+//   }
+// };
+  const handleBurn = async () => {
+    if (contract && burnAmount) {
+      try {
+        const amountInWei = ethers.parseEther(burnAmount);
+        const tx = await contract.burnToken(amountInWei);
+        await tx.wait(); // wait for confirmation
+        alert("Burn successful!");
+        getBalance(); // refresh balance
+      } catch (err) {
+        console.error("Burn failed:", err);
+      }
+    }
+  };
 
   return (
    <>
@@ -88,6 +116,16 @@ const handleMint = async () => {
                 onChange={(e) => setMintAmount(e.target.value)} 
               />
                <button onClick={handleMint}>Mint Tokens</button>
+            </div>
+
+            <div>
+              <input
+                type='number'
+                placeholder='Amount to Burn'
+                value={burnAmount}
+                onChange={(e) => setBurnAmount(e.target.value)} 
+              />
+               <button onClick={handleBurn}>Burn Tokens</button>
             </div>
           </>
           // <p>Connected Account: {account}</p>
